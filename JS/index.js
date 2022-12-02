@@ -1,37 +1,43 @@
-window.addEventListener("DOMContentLoaded", () =>{
+let startBtn = document.querySelector(".start-button"),
+  quizBox = document.querySelector(".quiz__box"),
+  resultBox = document.querySelector(".result__box"),
+  optionList = document.querySelector(".option__list"),
+  restartQuiz = resultBox.querySelector(".restart "),
+  nextBtn = document.querySelector(".next__btn");
 
+startBtn.onclick = () => {
+  quizBox.classList.add("activeQuiz");
+  showQuestions(0);
+};
 
-
-const startBtn = document.querySelector(".start-button"),
-continueBtn = startBtn.querySelector(".restart"),
-quizBox = document.querySelector(".quiz__box"),
-resultBox = document.querySelector(".result__box"),
-optionList = document.querySelector(".option__list"),
-restartQuiz = resultBox.querySelector(".restart "),
-nextBtn = resultBox.querySelector(".next__btn");
-
-startBtn.addEventListener("click", () =>{
-    startBtn.classList.add("none");
-    quizBox.classList.remove("none");
-     
-    showQuestions(0)
-
-
-})
 let queCount = 0;
-let userScore = 0
+let userScore = 0;
 
-function showQuestions (index){
- 
-    const quizText = document.querySelector(".quiz__text");
-        quizText.innerHTML = `
-        <span>${questions[index].question}</span>
+//
+
+nextBtn.addEventListener("click", () => {
+  if (queCount < questions.length - 1) {
+    queCount++;
+    showQuestions(queCount);
+  } else {
+    console.log("Questions Completed");
+    showResult();
+  }
+  nextBtn.style.display = "none";
+});
+
+// showQuestions function begin
+
+function showQuestions(index) {
+  const quizText = document.querySelector(".quiz__text");
+  quizText.innerHTML = `
+        <span>${index + 1}. ${questions[index].question}</span>
     `;
 
-    optionList.innerHTML = `
+  optionList.innerHTML = `
         <div class="option">
             <span>${questions[index].options[0]}</span>
-        </div>
+          </div>
         <div class="option">
             <span>${questions[index].options[1]}</span>
         </div>
@@ -41,80 +47,75 @@ function showQuestions (index){
         <div class="option">
             <span>${questions[index].options[3]}</span>
         </div>
-    `
+    `;
+  let quePageOf = document.querySelector(".que__pageof");
 
-    const option = optionList.querySelectorAll(".option");
-    
-    for(i = 0; i < option.length; i++){
-        option[i].setAttribute("onclick", "optionSelected(this)")
+  quePageOf.innerHTML = `
+    <span style="color:green; font-weight:900; font-size:20px;" >${
+      index + 1
+    }</span>/<span style="color:#000; font-size:20px; font-weight:900;">${
+    questions.length
+  }</span>
+ `;
+  let options = optionList.querySelectorAll(".option");
+
+  for (i = 0; i < options.length; i++) {
+    options[i].setAttribute("onclick", "optionSelected(this)");
+  }
+}
+// optionSelected function begin
+
+function optionSelected(ans) {
+  let userAns = ans.textContent.trim();
+  let correctAns = questions[queCount].answer.trim();
+  let allOptions = optionList.children.length;
+
+  let correctCheck = ' <i class="correctCheck fas fa-check"></i>';
+  let wrongCheck = '<i class=" wrongCheck fa-solid fa-xmark"></i>';
+  if (userAns == correctAns) {
+      userScore += 1;
+    console.log("tugri javob" + userScore);
+    ans.classList.add("correct");
+    ans.insertAdjacentHTML("beforeend", correctCheck);
+  } else {
+    console.log("notugri javob");
+    ans.classList.add("incorrect");
+    ans.insertAdjacentHTML("beforeend", wrongCheck);
+
+    for (let i = 0; i < allOptions; i++) {
+      if (optionList.children[i].textContent == correctAns) {
+        optionList.children[i].setAttribute("class", " option correct");
+      }
     }
+  }
+
+  for (let i = 0; i < allOptions; i++) {
+    optionList.children[i].classList.add("disabled");
+  }
+  nextBtn.style.display = "block";
 }
 
-nextBtn.onclick = () =>{
-    if(queCount < questions.length -1){
-        queCount++
-        showQuestions(queCount)
-    } else{
-        showResult(); 
-    }
-}
+function showResult() {
+  quizBox.classList.remove("activeQuiz");
+  resultBox.classList.add("activeResult");
 
-function optionSelected(answer){
-    let userAns = answer.textContent;
-    let correctAns = questions[queCount].answer;
-    let allOptions = optionList.children.length;
+  let scoreTag;
+  let scoreText = resultBox.querySelector(".score__text");
+  let crownIcon = `<i class=" crown__icon fa-solid fa-crown"></i>`
+  resultBox.insertAdjacentHTML("afterbegin", crownIcon)
 
-     if(userAns == correctAns){
-        userScore += 1;
-        answer.classList.add("correct")
-        console.log("correct" + userScore);
-     } else{
-        answer.classList.add("incorrect")
-        console.log("wrong Answer" + userScore);
-     }
-     
-     
-     
-     for(i = 0; i < allOption.length; i++){
-         optionList.children[i].classList.add("onclick", "optionSelected(this)")
-    }
-         nextBtn.classList.add("show")
-}
-
-
- function showResult()
-{
-    quizBox.classList.add("none")
-    resultBox.classList.remove("none")
-    const scoreText = resultBox.querySelector(".score__text")
-
-        if(userScore > 3){
-            let scoreTag = `<p>😎Vooov siz ${userScore}ta savolga javob berdingiz!</p>`
-            scoreText.innerHTML = scoreTag;
-        }
-        else if(userScore > 3){
-            let scoreTag = `😊<p>siz ${userScore}ta savolga javob berdingiz!</p>`
-            scoreText.innerHTML = scoreTag;
-        }
-        else{
-            let scoreTag = `<p>😮sizni balingiz yetarli emas!</p>`
-            scoreText.innerHTML = scoreTag;
-        }
+  if (userScore >= 4){
+    scoreTag = `<p class="result__text">😎 Qoyil siz <span style="color:green;">${userScore}</span> ta savolga javob berdingiz!</p>`;
+    scoreText.innerHTML = scoreTag;
+  } else if (userScore > 2) {
+    scoreTag = `😊<p class="result__text">siz <span style="color:green;">${userScore}</span>ta savolga javob berdingiz!</p>`;
+    scoreText.innerHTML = scoreTag;
+  } else {
+    scoreTag = `<p class="result__text"> 🙄 sizni balingiz yetarli emas!</p>`;
+    scoreText.innerHTML = scoreTag;
+  }
 }
 
 restartQuiz.onclick = () =>{
-    resultBox.classList.add("none")
-    quizBox.classList.remove("none")
-    queCount = 0;
-    userScore = 0;
-    showQuestions(queCount)
-    nextBtn.classList.remove(' ')
+    window.location.reload();
 }
-
-
-
-
-
-
-
-})

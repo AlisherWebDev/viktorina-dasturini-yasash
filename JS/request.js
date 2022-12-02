@@ -12,7 +12,7 @@ let questions = [
     },
     {
         numb: 2,
-        question: "O'zbekiston davati Konstitutsiyasi qachon qabul qilingan?",
+        question: "O'zbekiston davlati Konstitutsiyasi qachon qabul qilingan?",
         answer: "1992-yil 8-dekabr",
         options:[
             "1991-yil 10-dekabr",
